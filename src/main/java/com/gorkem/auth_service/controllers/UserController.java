@@ -2,6 +2,7 @@ package com.gorkem.auth_service.controllers;
 
 import com.gorkem.auth_service.dto.UserResponse;
 import com.gorkem.auth_service.dto.UserSaveRequest;
+import com.gorkem.auth_service.dto.UserUpdateRequest;
 import com.gorkem.auth_service.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -31,8 +32,8 @@ public class UserController {
     }
 
     @PutMapping("{userId}")
-    public UserResponse updateUser(@PathVariable Long userId, @RequestBody UserSaveRequest updateUserRequest){
-        return userService.updateUser(userId,updateUserRequest);
+    public UserResponse updateUser(@PathVariable Long userId, @RequestBody UserUpdateRequest updateUserRequest) {
+        return userService.updateUser(userId, updateUserRequest);
     }
 
     @DeleteMapping("{userId}")

@@ -2,6 +2,7 @@ package com.gorkem.auth_service.services;
 
 import com.gorkem.auth_service.dto.UserResponse;
 import com.gorkem.auth_service.dto.UserSaveRequest;
+import com.gorkem.auth_service.dto.UserUpdateRequest;
 import com.gorkem.auth_service.entities.Role;
 import com.gorkem.auth_service.entities.User;
 import com.gorkem.auth_service.repos.UserRepository;
@@ -60,15 +61,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse updateUser(Long userId, UserSaveRequest updateUserRequest) {
+    public UserResponse updateUser(Long userId, UserUpdateRequest updateUserRequest) {
         User foundUser = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         foundUser.setFirstName(updateUserRequest.firstName());
         foundUser.setLastName(updateUserRequest.lastName());
         foundUser.setEmail(updateUserRequest.email());
-
-        foundUser.setPassword(passwordEncoder.encode(updateUserRequest.password()));
 
         User updatedUser = userRepository.save(foundUser);
         return new UserResponse(

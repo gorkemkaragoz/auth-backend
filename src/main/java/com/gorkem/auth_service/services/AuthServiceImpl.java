@@ -58,8 +58,7 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı!"));
 
         // Her şey doğruysa token üret
-        String jwtToken = jwtService.generateToken(user.getEmail());
-
+        String jwtToken = jwtService.generateToken(user.getEmail(), user.getRole().name());
         return new AuthResponse(
                 jwtToken,
                 user.getId(),
