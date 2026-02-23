@@ -15,7 +15,7 @@ This is a robust **Java Backend** application focused on secure authentication a
 * **Language**: Java 21 (utilizing modern features like Records)
 * **Framework**: Spring Boot 3.x
 * **Security**: Spring Security & JWT
-* **Database**: MySQL / PostgreSQL
+* **Database**: MySQL
 * **Mail Service**: Spring Boot Starter Mail (Gmail SMTP)
 * **Containerization**: Docker & Docker Compose
 
