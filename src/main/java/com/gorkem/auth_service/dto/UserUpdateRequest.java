@@ -1,7 +1,10 @@
 package com.gorkem.auth_service.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+
 public record UserUpdateRequest(
-        String firstName,
-        String lastName,
-        String email
+        @NotBlank String firstName,
+        @NotBlank String lastName,
+        @NotBlank @Email String email
 ) {}

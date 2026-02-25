@@ -1,6 +1,7 @@
 package com.gorkem.auth_service.security;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Service;
@@ -38,8 +39,12 @@ public class JwtService {
     }
 
     public boolean isTokenValid(String token, String email) {
-        final String userEmail = extractEmail(token);
-        return (userEmail.equals(email)) && !isTokenExpired(token);
+        try {
+            final String userEmail = extractEmail(token);
+            return (userEmail.equals(email)) && !isTokenExpired(token);
+        } catch (JwtException e) {
+            return false;
+        }
     }
 
     private boolean isTokenExpired(String token) {

@@ -5,6 +5,7 @@ import com.gorkem.auth_service.dto.UserSaveRequest;
 import com.gorkem.auth_service.dto.UserUpdateRequest;
 import com.gorkem.auth_service.entities.Role;
 import com.gorkem.auth_service.entities.User;
+import com.gorkem.auth_service.exception.UserNotFoundException;
 import com.gorkem.auth_service.repos.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,7 +24,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse getOneUser(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found."));
 
         return new UserResponse(user.getId(), user.getFirstName(),
                 user.getLastName(), user.getEmail(), user.getRole());
@@ -63,7 +64,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse updateUser(Long userId, UserUpdateRequest updateUserRequest) {
         User foundUser = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found."));
 
         foundUser.setFirstName(updateUserRequest.firstName());
         foundUser.setLastName(updateUserRequest.lastName());

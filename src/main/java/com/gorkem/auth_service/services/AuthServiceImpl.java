@@ -3,9 +3,14 @@ package com.gorkem.auth_service.services;
 import com.gorkem.auth_service.dto.*;
 import com.gorkem.auth_service.entities.Role;
 import com.gorkem.auth_service.entities.User;
+import com.gorkem.auth_service.exception.EmailAlreadyExistsException;
+import com.gorkem.auth_service.exception.InvalidOtpException;
+import com.gorkem.auth_service.exception.OtpExpiredException;
+import com.gorkem.auth_service.exception.UserNotFoundException;
 import com.gorkem.auth_service.repos.UserRepository;
 import com.gorkem.auth_service.security.JwtService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Random;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -27,7 +33,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public UserResponse register(AuthRegisterRequest request) {
         if (userRepository.existsByEmail(request.email())) {
-            throw new RuntimeException("Bu email zaten kayıtlı!");
+            throw new EmailAlreadyExistsException("This email address is already registered.");
         }
 
         User user = new User();
@@ -35,7 +41,7 @@ public class AuthServiceImpl implements AuthService {
         user.setLastName(request.lastName());
         user.setEmail(request.email());
         user.setPassword(passwordEncoder.encode(request.password()));
-        user.setRole(Role.ROLE_MEMBER); //
+        user.setRole(Role.ROLE_MEMBER);
 
         User savedUser = userRepository.save(user);
         return new UserResponse(
@@ -49,15 +55,13 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse login(AuthLoginRequest request) {
-        // Spring Security ile kimlik doğrulama yapıyoruz
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.email(), request.password())
         );
 
         User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı!"));
+                .orElseThrow(() -> new UserNotFoundException("User not found."));
 
-        // Her şey doğruysa token üret
         String jwtToken = jwtService.generateToken(user.getEmail(), user.getRole().name());
         return new AuthResponse(
                 jwtToken,
@@ -65,44 +69,40 @@ public class AuthServiceImpl implements AuthService {
                 user.getEmail(),
                 user.getRole()
         );
-
     }
 
     @Override
     public void forgotPassword(ForgotPasswordRequest request) {
-        // 1. Kullanıcı var mı kontrol et
         User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new RuntimeException("Bu email ile kayıtlı kullanıcı bulunamadı!"));
+                .orElseThrow(() -> new UserNotFoundException("No account found with this email address."));
 
-        // 2. 6 haneli kod üret ve süre ata
         String otp = String.valueOf(new Random().nextInt(900000) + 100000);
         user.setOtpCode(otp);
-        user.setOtpExpiry(LocalDateTime.now().plusMinutes(5)); //
+        user.setOtpExpiry(LocalDateTime.now().plusMinutes(5));
 
         userRepository.save(user);
 
-        // 3. Maili gönder
         try {
             mailService.sendOtpMail(user.getEmail(), otp);
         } catch (Exception e) {
-            System.out.println("Mail gönderilemedi ama OTP kaydedildi: " + e.getMessage());
+            log.warn("Mail gönderilemedi ama OTP kaydedildi: {}", e.getMessage());
         }
     }
 
     @Override
     public void resetPassword(ResetPasswordRequest request) {
         User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı!"));
+                .orElseThrow(() -> new UserNotFoundException("User not found."));
 
         if (user.getOtpCode() == null || !user.getOtpCode().equals(request.otpCode())) {
-            throw new RuntimeException("Geçersiz doğrulama kodu!");
+            throw new InvalidOtpException("Invalid verification code.");
         }
 
         if (user.getOtpExpiry().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Kodun süresi dolmuş, Patron!");
+            throw new OtpExpiredException("Verification code has expired. Please request a new one.");
         }
 
-        user.setPassword(passwordEncoder.encode(request.newPassword())); //
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
         user.setOtpCode(null);
         user.setOtpExpiry(null);
 

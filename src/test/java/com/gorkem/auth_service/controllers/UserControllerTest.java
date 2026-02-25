@@ -5,9 +5,8 @@ import com.gorkem.auth_service.dto.UserResponse;
 import com.gorkem.auth_service.dto.UserSaveRequest;
 import com.gorkem.auth_service.dto.UserUpdateRequest;
 import com.gorkem.auth_service.entities.Role;
+import com.gorkem.auth_service.config.SecurityConfig;
 import com.gorkem.auth_service.security.CustomUserDetailsService;
-import com.gorkem.auth_service.security.JwtAuthFilter;
-import com.gorkem.auth_service.security.JwtProperties;
 import com.gorkem.auth_service.security.JwtService;
 import com.gorkem.auth_service.services.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +14,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -29,6 +29,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(UserController.class)
+@Import(SecurityConfig.class)
 class UserControllerTest {
 
     @Autowired
@@ -45,9 +46,6 @@ class UserControllerTest {
 
     @MockitoBean
     private CustomUserDetailsService customUserDetailsService;
-
-    @MockitoBean
-    private JwtAuthFilter jwtAuthFilter;
 
     private UserResponse userResponse;
 

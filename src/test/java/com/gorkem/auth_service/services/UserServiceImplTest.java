@@ -76,7 +76,7 @@ class UserServiceImplTest {
         // When & Then
         assertThatThrownBy(() -> userService.getOneUser(99L))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("User not found");
+                .hasMessage("Kullanıcı bulunamadı!");
     }
 
     // --- getAllUsers ---
@@ -172,7 +172,7 @@ class UserServiceImplTest {
         // When & Then
         assertThatThrownBy(() -> userService.updateUser(99L, request))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("User not found");
+                .hasMessage("Kullanıcı bulunamadı!");
     }
 
     // --- deleteUser ---

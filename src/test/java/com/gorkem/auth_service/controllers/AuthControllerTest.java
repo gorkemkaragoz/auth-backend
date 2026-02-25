@@ -4,14 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gorkem.auth_service.dto.*;
 import com.gorkem.auth_service.entities.Role;
 import com.gorkem.auth_service.security.CustomUserDetailsService;
-import com.gorkem.auth_service.security.JwtAuthFilter;
 import com.gorkem.auth_service.security.JwtService;
 import com.gorkem.auth_service.services.AuthService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import com.gorkem.auth_service.config.SecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -22,6 +23,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AuthController.class)
+@Import(SecurityConfig.class)
 class AuthControllerTest {
 
     @Autowired
@@ -39,9 +41,6 @@ class AuthControllerTest {
 
     @MockitoBean
     private CustomUserDetailsService customUserDetailsService;
-
-    @MockitoBean
-    private JwtAuthFilter jwtAuthFilter;
 
     // --- POST /auth/register ---
 

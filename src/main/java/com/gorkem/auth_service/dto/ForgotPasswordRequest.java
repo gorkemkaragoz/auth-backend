@@ -1,5 +1,8 @@
 package com.gorkem.auth_service.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+
 public record ForgotPasswordRequest(
-        String email
-) { }
+        @NotBlank @Email String email
+) {}

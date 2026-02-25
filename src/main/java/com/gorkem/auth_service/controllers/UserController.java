@@ -4,6 +4,7 @@ import com.gorkem.auth_service.dto.UserResponse;
 import com.gorkem.auth_service.dto.UserSaveRequest;
 import com.gorkem.auth_service.dto.UserUpdateRequest;
 import com.gorkem.auth_service.services.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,12 +28,12 @@ public class UserController {
     }
 
     @PostMapping
-    public UserResponse createUser(@RequestBody UserSaveRequest newUserRequest){
+    public UserResponse createUser(@Valid @RequestBody UserSaveRequest newUserRequest){
         return userService.createUser(newUserRequest);
     }
 
     @PutMapping("{userId}")
-    public UserResponse updateUser(@PathVariable Long userId, @RequestBody UserUpdateRequest updateUserRequest) {
+    public UserResponse updateUser(@PathVariable Long userId, @Valid @RequestBody UserUpdateRequest updateUserRequest) {
         return userService.updateUser(userId, updateUserRequest);
     }
 
